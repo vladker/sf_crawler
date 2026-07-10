@@ -1498,7 +1498,7 @@
         ? (__sfera_crawler_bg_state.settings.endNumber
             ? __sfera_crawler_bg_state.settings.endNumber - __sfera_crawler_bg_state.settings.startNumber + 1
             : "∞")
-        : 0,
+          : 0,
       errorsCount: __sfera_crawler_bg_errors.length,
       mode: __sfera_crawler_bg_state
         ? __sfera_crawler_bg_state.settings
@@ -1508,7 +1508,44 @@
       hasSavedProgress: false,
     };
 
-    // Also check if there's saved progress
+    // Restore from storage if SW restarted (in-memory state is empty)
+    if (
+      !__sfera_crawler_bg_state &&
+      Object.keys(__sfera_crawler_bg_collectedData).length === 0
+    ) {
+      try {
+        chrome.storage.local.get(
+          "crawlerProgress",
+          function (result) {
+            if (
+              !chrome.runtime.lastError &&
+              result.crawlerProgress
+            ) {
+              var stored = result.crawlerProgress;
+              // Restore status from stored progress
+              payload.status = stored.status || "stopped";
+              payload.currentNumber = stored.currentNumber || null;
+              // Count stored data
+              var storedData = stored.collectedData || {};
+              payload.processedCount = Object.keys(storedData).length;
+              payload.mode = stored.settings
+                ? stored.settings.mode
+                : "single";
+              // Show resume button only if not completed
+              if (stored.status !== "completed") {
+                payload.hasSavedProgress = true;
+              }
+            }
+            if (sendResponse) sendResponse(payload);
+          }
+        );
+      } catch (e) {
+        if (sendResponse) sendResponse(payload);
+      }
+      return;
+    }
+
+    // Normal path: in-memory state is live, just check for resume eligibility
     try {
       chrome.storage.local.get(
         "crawlerProgress",
