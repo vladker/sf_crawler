@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><base href="/"/><meta charset="utf-8"/><link rel="icon" href="favicon.png" type="image/png"/><link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Sfera ui"/><script type="text/javascript" src="/ppcg/ruxitagentjs_ICA27NVfqrux_10233220201140653.js" data-dtconfig="rid=RID_1478554294|rpid=-1552022649|domain=vtb.ru|reportUrl=/ppcg/rb_2560eb1a-ed2c-4f1a-a3e3-fa0004915d87|app=51136e1c01fc9d3d|cuc=kxsi1nno|mel=100000|featureHash=ICA27NVfqrux|dpvc=1|ssv=4|lastModification=1783006567446|tp=500,50,0,1|rdnt=0|uxrgce=1|bp=3|agentUri=/ppcg/ruxitagentjs_ICA27NVfqrux_10233220201140653.js"></script><link rel="apple-touch-icon" href="apple-touch-icon.png"/><link rel="manifest" href="manifest.json"/><title>Sfera</title><script defer="defer" src="static/js/main.b2727b041f440cf0d784.js"></script><script defer="defer" src="remoteEntry.js?v=b06fd5e278666d6f83f6"></script><script>
+            const originalFetch = window.fetch;
+            window.fetch = async function() {
+                const response = await originalFetch.apply(this, arguments);
+                if (response.status === 431) {
+                    window.location.href = window.location.origin + "/431.html";
+                }
+                return response;
+            };
+            const originalXhrOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function() {
+                this.addEventListener("load", function() {
+                    if (this.status === 431) {
+                        window.location.href = window.location.origin + "/431.html";
+                    }
+                });
+                originalXhrOpen.apply(this, arguments);
+            };
+        </script></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>

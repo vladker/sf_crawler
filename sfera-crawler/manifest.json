@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Sfera Crawler",
+  "version": "1.0.0",
+  "description": "Парсер системы изменений Sfera (sfera.vtb.ru) — обход номеров и извлечение данных",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "storage",
+    "downloads",
+    "webNavigation",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://sfera.vtb.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://sfera.vtb.ru/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Sfera Crawler"
+  },
+  "icons": {
+    "128": "icons/icon-128.svg"
+  }
+}

@@ -1,0 +1,409 @@
+
+  "changes": {
+    "C-VTB-01411045": {
+          "https://sfera.vtb.ru/app/ppcg-fw/api/api/v0.1/entities/C-VTB-01411045": {
+            "id": 1549842,
+            "number": "C-VTB-01411045",
+            "areaCode": "C",
+            "typeId": 3,
+            "type": "planned",
+            "statusId": 1,
+            "status": "REGISTERED",
+            "priorityId": 1,
+            "priority": "average",
+            "name": "[1672] [Магнит] Применение настроек parb-phonce-orc и parb-webauthn-orc на контуре ПРОД",
+            "description": "Для следующих микросервисов необходимо добавить переменные:\nдля parb-phone-orc\nSESSION_MANAGER_SESSION_LIFESPAN: \"960\"\nдля parb-webauthn-orc\nCLIENT_SESSION_MANAGER_SESSION_LIFESPAN: \"960\"\n\nПеременные означают время жизни сессии",
+            "createDate": "2026-07-10T11:17:52Z",
+            "createdBy": {
+              "id": 61710,
+              "login": "vtb4094212@region.vtb.ru",
+              "firstName": "Эдвард",
+              "patronymic": "Азатович",
+              "lastName": "Хачатрян",
+              "email": "eahachatryan@vtb.ru",
+              "color": "Special/Static Dark Turquoise",
+              "activityStatus": "active"
+            },
+            "updateDate": "2026-07-10T11:20:07Z",
+            "updatedBy": {
+              "id": 61710,
+              "login": "vtb4094212@region.vtb.ru",
+              "firstName": "Эдвард",
+              "patronymic": "Азатович",
+              "lastName": "Хачатрян",
+              "email": "eahachatryan@vtb.ru",
+              "color": "Special/Static Dark Turquoise",
+              "activityStatus": "active"
+            },
+            "state": "Normal",
+            "rank": "0|qxejxb:",
+            "childEntities": [],
+            "customFieldsValues": [
+              {
+                "code": "subtype",
+                "name": "Подтип",
+                "type": "objectDictionary",
+                "value": "[{\"id\":\"6\",\"value\":\"Настройка прикладного ПО\",\"parentValue\":\"planned\"}]",
+                "dictionaryId": 1
+              },
+              {
+                "code": "customer",
+                "name": "Заказчик",
+                "type": "customUser",
+                "value": "{\"id\":10824,\"login\":\"vtb206619@region.vtb.ru\",\"firstName\":\"Станислав\",\"patronymic\":\"Олегович\",\"lastName\":\"Воронков\",\"email\":\"svoronkov@vtb.ru\",\"color\":\"Special/Static Dark Cyan\",\"activityStatus\":\"active\",\"employeeNumber\":\"70095366\"}",
+                "dictionaryId": 7
+              },
+              {
+                "code": "drpFilled",
+                "name": "DRP Заполнено",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "initiator",
+                "name": "Инициатор",
+                "type": "customUser",
+                "value": "{\"id\":61710,\"login\":\"vtb4094212@region.vtb.ru\",\"firstName\":\"Эдвард\",\"patronymic\":\"Азатович\",\"lastName\":\"Хачатрян\",\"email\":\"eahachatryan@vtb.ru\",\"color\":\"Special/Static Dark Turquoise\",\"activityStatus\":\"active\",\"employeeNumber\":\"4094212\"}",
+                "dictionaryId": 6
+              },
+              {
+                "code": "riskLevel",
+                "name": "Уровень риска",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"38\",\"value\":\"Низкий\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low_risk_level\"}]",
+                "dictionaryId": 27
+              },
+              {
+                "code": "workGroup",
+                "name": "Рабочая группа",
+                "type": "objectDictionary",
+                "value": "[{\"id\":\"368\",\"value\":\"Аутентификация ФЛ РБ-МСК-3Л\",\"externalId\":\"WGR-2024-1630\"}]",
+                "dictionaryId": 5
+              },
+              {
+                "code": "checklists",
+                "name": "Чек листы",
+                "type": "text",
+                "value": "Конф для проведения работ: \nhttps://dion.vc/event/sso\n0. Проведение ретроспективного анализа.\n1.  Оповещение о начале работ в чаты УСиЭСРБ it-complex работы, Общий сервис. Аутентификация.\n2. Выполнение работ по чек листу согласно вложению.\n3. Проведение Смок тестов.\n4. Проведение повторного ретроспективного анализа\n5. Информирование о статусе завершения работ\nЧек-лист постановки ИС на сопровождение ДППСиС\nhttps://sfera.vtb.ru/documents/196482\n\nРА ИС 1672 Аутентификация ФЛ РБ - https://sfera.vtb.ru/documents/publications/721256 "
+              },
+              {
+                "code": "customReach",
+                "name": "Пользовательский охват",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"56\",\"value\":\"Без влияния на пользователей\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 33
+              },
+              {
+                "code": "taskReports",
+                "name": "Отчеты о тестировании",
+                "type": "text",
+                "value": "Дописать"
+              },
+              {
+                "code": "dbDataChange",
+                "name": "Изменение данных в БД",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"26\",\"value\":\"Нет\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "rollbackPlan",
+                "name": "План отката",
+                "type": "text",
+                "value": "Установка в рамках задачи SD-16073441 Кузнецов Александр"
+              },
+              {
+                "code": "initiatorTeam",
+                "name": "Команда инициатора",
+                "type": "objectDictionary",
+                "value": "[{\"id\":\"TEM-2718\",\"value\":\"Стрим Единая клиентская идентификация\",\"parentValue\":\"61710\",\"childValues\":[{\"id\":\"STR-308\",\"value\":\"Единая клиентская идентификация\",\"externalId\":\"a11efafc-b58d-4d33-9ba2-abe10107f8c4\"}]}]",
+                "dictionaryId": 9
+              },
+              {
+                "code": "loadTestsDone",
+                "name": "Проведено ли нагрузочное тестирование",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"25\",\"value\":\"Да\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "planningStart",
+                "name": "Плановое начало",
+                "type": "dateTime",
+                "value": "2026-07-11T22:00:00.000Z"
+              },
+              {
+                "code": "projectNumber",
+                "name": "Номер проекта",
+                "type": "string",
+                "value": "ПР-3846"
+              },
+              {
+                "code": "publicationId",
+                "name": "publicationId",
+                "type": "string",
+                "value": "145bcfe2-f4b0-4d0c-a628-442c678e2829"
+              },
+              {
+                "code": "notifyManagers",
+                "name": "Оповещение руководителей",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "planningFinish",
+                "name": "Плановое окончание",
+                "type": "dateTime",
+                "value": "2026-07-11T23:00:00.000Z"
+              },
+              {
+                "code": "testConclusion",
+                "name": "Заключение о тестировании",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"47\",\"value\":\"Все тесты пройдены успешно\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 22
+              },
+              {
+                "code": "approvalAttempt",
+                "name": "approvalAttempt",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "initiatorDeputy",
+                "name": "Заместитель инициатора",
+                "type": "customUser",
+                "value": "{\"id\":33221,\"login\":\"vtb4091040@region.vtb.ru\",\"firstName\":\"Владимир\",\"patronymic\":\"Олегович\",\"lastName\":\"Липко\",\"email\":\"vlipko@vtb.ru\",\"color\":\"Special/Static Light Purple\",\"activityStatus\":\"active\",\"employeeNumber\":\"4091040\"}",
+                "dictionaryId": 6
+              },
+              {
+                "code": "initiatorStream",
+                "name": "Стрим инициатора",
+                "type": "objectDictionary",
+                "value": "[{\"id\":\"STR-308\",\"value\":\"Единая клиентская идентификация\",\"externalId\":\"a11efafc-b58d-4d33-9ba2-abe10107f8c4\"}]",
+                "dictionaryId": 10
+              },
+              {
+                "code": "reportAvailable",
+                "name": "Наличие отчета",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "successCriteria",
+                "name": "Критерии успеха",
+                "type": "text",
+                "value": "1. Отсутствуют ошибки при установке из чек-листа и РА, микросервис запустился без ошибок.\n2. На дашборде дежурной смены СЦПК ИС 1672 отсутствуют аномалии по входам на канале Альфе\n3. На дашборде микросервисов ИС 1672 https://tsam-balancer-grafana-prod.region.vtb.ru/d/ba75bdc6-2563-49ab-9f16-b625dff9d591/1672-msa-v2?orgId=785 отсутствуют аномалии"
+              },
+              {
+                "code": "implementationPlan",
+                "name": "План реализации",
+                "type": "text",
+                "value": "Выполнить изменение настройки поплечно согласно чек-листу из вложения и РА."
+              },
+              {
+                "code": "needInitiatorCheck",
+                "name": "Требуется проверка",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "impactOnIsPerfomance",
+                "name": "Влияние на производительность ИС",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"26\",\"value\":\"Нет\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "implementationReason",
+                "name": "Причина реализации",
+                "type": "text",
+                "value": "Применение настроек для обновления времени жизни сессии"
+              },
+              {
+                "code": "reservationAvailable",
+                "name": "Наличие резервирования",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"26\",\"value\":\"Нет\",\"color\":\"Warning/Warning 50\",\"icon\":\"/api/v0.1/dictionaries/icons/high\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "adjustmentAfterClosing",
+                "name": "Корректировка после закрытия",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "measuresToMinimizeRisks",
+                "name": "Мероприятия для минимизации рисков",
+                "type": "text",
+                "value": "Проведение работ в ТО по плечно"
+              },
+              {
+                "code": "areInfrastructureWorksPlanned",
+                "name": "Планируются ли работы в инфраструктуре",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"66\",\"value\":\"Нет\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 37
+              },
+              {
+                "code": "candidateForStandardSolutions",
+                "name": "Кандидат в стандартные решения",
+                "type": "boolean",
+                "value": "false"
+              },
+              {
+                "code": "implementationRisksDescription",
+                "name": "Описание рисков внедрения",
+                "type": "text",
+                "value": "Риски минимальны версия не меняется"
+              },
+              {
+                "code": "isWorkTimeIncludedInMoratorium",
+                "name": "Входит ли время работ в мораторий",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"26\",\"value\":\"Нет\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "durationAndPossibilityOfRollback",
+                "name": "Длительность и возможность проведения отката",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"60\",\"value\":\"Менее 1 часа\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 26
+              },
+              {
+                "code": "implementationOfSuchZniLedToAccidents",
+                "name": "Приводило к авариям выполнение подобного ЗНИ",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"62\",\"value\":\"Сложные работы проходили без аварий\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 34
+              },
+              {
+                "code": "changeAffectsMoreThanOneConsumerSystem",
+                "name": "Изменение влияет более, чем на 1 систему потребителя",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"52\",\"value\":\"Часть функциональности одной ИТ-системы \",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 29
+              },
+              {
+                "code": "criteriaForMakingDecisionsAboutRollback",
+                "name": "Критерии принятия решения об откате",
+                "type": "text",
+                "value": "Несоответствие критериям успеха"
+              },
+              {
+                "code": "isWorkTimeIncludedInTechnologicalWindow",
+                "name": "Входит ли время работ в технологическое окно",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"25\",\"value\":\"Да\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 19
+              },
+              {
+                "code": "businessProcessesAvailabilityPlannedImpact",
+                "name": "Планируемое влияние на доступность ключевых бизнес-процессов",
+                "type": "dictionaryWithIcon",
+                "value": "[{\"id\":\"43\",\"value\":\"Без влияния\",\"color\":\"Success/Success 50\",\"icon\":\"/api/v0.1/dictionaries/icons/low\"}]",
+                "dictionaryId": 35
+              }
+            ],
+            "permissions": [
+              {
+                "code": "copy",
+                "accessible": true
+              },
+              {
+                "code": "archive",
+                "accessible": true
+              },
+              {
+                "code": "changeChild",
+                "accessible": true
+              },
+              {
+                "code": "changeParent",
+                "accessible": true
+              },
+              {
+                "code": "processLinks",
+                "accessible": true
+              },
+              {
+                "code": "shareLink",
+                "accessible": true
+              }
+            ],
+            "relatedEntities": [],
+            "externalRelatedEntities": [],
+            "attachments": [],
+            "linkedRelatedEntities": [],
+            "emNumber": "",
+            "label": [],
+            "customEntityTypes": {},
+            "currentDateInfo": {
+              "cabDay": false,
+              "holiday": false,
+              "moratoriumActive": false
+            },
+            "currentUser": {
+              "roles": [],
+              "workGroupIds": [
+                "CMON-МСК-2Л",
+                "Инструменты мониторинга производства",
+                "IT_measures-МСК-Вторая линия",
+                "3лп_Мониторинг_Производства_ПБ-МСК-3ЛП"
+              ],
+              "user": {
+                "id": 48627,
+                "login": "vtb200126@region.vtb.ru",
+                "firstName": "Владислав",
+                "patronymic": "Вадимович (70093715)",
+                "lastName": "Рогачёв",
+                "email": "vvrogachev@vtb.ru",
+                "color": "Special/Static Neutral 20",
+                "activityStatus": "active",
+                "employeeNumber": "70093715"
+              },
+              "isCuOwner": false
+            },
+            "component": [],
+            "ctTemplate": [],
+            "configurationUnit": [
+              {
+                "id": "CI1199213",
+                "internalId": 744043,
+                "recordId": "fc5980df-85d6-466d-86ef-ed65103aa6a7",
+                "name": "Аутентификация ФЛ РБ_PROD",
+                "type": "ИТ-система",
+                "status": "exploitation",
+                "category": "РИС",
+                "owner": "vtb196664@region.vtb.ru",
+                "replacingOwners": [
+                  "vtb213257@region.vtb.ru",
+                  "vtb70166604@region.vtb.ru"
+                ],
+                "environment": "PROD",
+                "responsibleGroup": "Аутентификация ФЛ РБ-МСК-3Л",
+                "plannedDegradation": "Не влияет",
+                "downtimeComment": "",
+                "commentOnDegradation": "",
+                "fromTemplate": false,
+                "inTechWindow": true,
+                "inScheduledWorkTime": false,
+                "icons": {
+                  "inTechWindow": {
+                    "color": "Success/Success 50",
+                    "icon": "/api/v0.1/dictionaries/icons/low"
+                  },
+                  "inScheduledWorkTime": {
+                    "color": "Success/Success 50",
+                    "icon": "/api/v0.1/dictionaries/icons/low"
+                  }
+                }
+              }
+            ],
+            "messages": [],
+            "rolledBack": "",
+            "drpAttachments": []
+          },
+          

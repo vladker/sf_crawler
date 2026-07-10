@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Sfera Crawler</h1>
+    <p class="subtitle">Обход изменений C-VTB</p>
+
+    <!-- Стартовый номер -->
+    <div class="field">
+      <label for="startNumber">Стартовый номер</label>
+      <input type="number" id="startNumber" required placeholder="Например: 12345">
+    </div>
+
+    <!-- Конечный номер -->
+    <div class="field">
+      <label for="endNumber">Конечный номер</label>
+      <input type="number" id="endNumber" placeholder="Пусто = до первого пропуска">
+    </div>
+
+    <!-- Задержка -->
+    <div class="field">
+      <label for="delay">Задержка (мс): <span id="delayValue">3000</span></label>
+      <div class="range-row">
+        <input type="range" id="delay" min="1000" max="30000" step="500" value="3000">
+        <input type="number" id="delayNum" min="1000" max="30000" step="500" value="3000">
+      </div>
+    </div>
+
+    <!-- Потоки (concurrency) -->
+    <div class="field">
+      <label for="concurrency">Потоков сбора: <span id="concurrencyValue">3</span></label>
+      <div class="range-row">
+        <input type="range" id="concurrency" min="1" max="5" step="1" value="3">
+        <input type="number" id="concurrencyNum" min="1" max="5" step="1" value="3">
+      </div>
+    </div>
+
+    <!-- Макс. ошибок подряд -->
+    <div class="field">
+      <label for="maxErrors">Макс. ошибок подряд</label>
+      <input type="number" id="maxErrors" min="1" max="100" value="10">
+    </div>
+
+    <!-- Режим вывода -->
+    <div class="field">
+      <label>Режим вывода</label>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="mode" value="single" checked>
+          Один файл (changes.json)
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="mode" value="per-number">
+          По файлу на номер
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="mode" value="update">
+          Обновление существующих
+        </label>
+      </div>
+    </div>
+
+    <!-- Автоскачивание -->
+    <div class="field checkbox-field">
+      <label class="checkbox-label">
+        <input type="checkbox" id="autoDownload" checked>
+        <span class="checkbox-custom"></span>
+        <span>Скачивать сразу</span>
+      </label>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="buttons">
+      <button id="startBtn" class="btn btn-primary">Start</button>
+      <button id="stopBtn" class="btn btn-secondary" disabled>Stop</button>
+      <button id="resumeBtn" class="btn btn-tertiary" style="display:none;">Resume</button>
+    </div>
+
+    <!-- Download buttons (manual export) -->
+    <div class="export-buttons" style="display:none;" id="exportButtons">
+      <button id="downloadBtn" class="btn btn-download">⬇ JSON</button>
+      <button id="csvBtn" class="btn btn-download btn-csv">⬇ CSV</button>
+    </div>
+
+    <!-- Статус-панель -->
+    <div id="statusPanel" class="status-panel">
+      <div class="status-row">
+        <span class="status-label">Номер:</span>
+        <span id="currentNumber">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Таб:</span>
+        <span id="currentTab">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Собрано:</span>
+        <span id="collected">0/0</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Ошибки:</span>
+        <span id="errors">0</span>
+      </div>
+      <div class="log-container">
+        <div id="log" class="log"></div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
