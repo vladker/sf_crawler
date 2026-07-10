@@ -42,7 +42,6 @@
         csvBtn: document.getElementById("csvBtn"),
         exportButtons: document.getElementById("exportButtons"),
         currentNumber: document.getElementById("currentNumber"),
-        currentTab: document.getElementById("currentTab"),
         collected: document.getElementById("collected"),
         errors: document.getElementById("errors"),
         log: document.getElementById("log"),
@@ -171,10 +170,10 @@
           { type: "GET_STATUS" },
           function (response) {
             void chrome.runtime.lastError;
-            if (
-              response &&
-              response.hasSavedProgress
-            ) {
+            if (!response) return;
+            // Update full UI with current status (show export buttons if crawl finished)
+            self.updateStatus(response);
+            if (response.hasSavedProgress) {
               self.hasSavedProgress = true;
               if (self.els.resumeBtn) {
                 self.els.resumeBtn.style.display = "";
@@ -442,10 +441,6 @@
       if (this.els.currentNumber) {
         this.els.currentNumber.textContent =
           payload.currentNumber || "—";
-      }
-      if (this.els.currentTab) {
-        this.els.currentTab.textContent =
-          payload.currentTab || "—";
       }
       if (this.els.collected) {
         this.els.collected.textContent =

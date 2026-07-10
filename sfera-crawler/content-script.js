@@ -92,12 +92,11 @@
   // ─────────────────────────────────────────────
 
   /**
-   * Parse changeNumber and tabName from current URL.
+   * Parse changeNumber from current URL.
    * URL pattern: sfera.vtb.ru/ppcg-fw/change-tasks/(C-VTB-\d+)/...
    */
   function __sfera_crawler_parseUrl() {
     var changeNumber = null;
-    var tabName = null;
 
     try {
       var pathname = window.location.pathname;
@@ -112,19 +111,11 @@
           changeNumber = segment;
         }
       }
-
-      // tabName: from query parameter ?tab=...
-      try {
-        var params = new URLSearchParams(window.location.search);
-        tabName = params.get("tab");
-      } catch (e) {
-        // ignore
-      }
     } catch (e) {
       // ignore
     }
 
-    return { changeNumber: changeNumber, tabName: tabName };
+    return { changeNumber: changeNumber, tabName: "entity" };
   }
 
   // ─────────────────────────────────────────────
@@ -950,7 +941,7 @@
 
     var urlInfo = __sfera_crawler_parseUrl();
     var changeNumber = urlInfo.changeNumber || null;
-    var tabName = urlInfo.tabName || null;
+    var tabName = "entity";  // single entity API, no tab routing
 
     var observer = null;
     var mutationTimeout = null;

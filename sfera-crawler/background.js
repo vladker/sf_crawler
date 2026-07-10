@@ -11,25 +11,12 @@
   // ─────────────────────────────────────────────
   // Constants
   // ─────────────────────────────────────────────
-  var __sfera_crawler_bg_TABS = [
-    "mainInfo",
-    "influence",
-    "relatedItems",
-    "riskLevel",
-    "implementationTasks",
-    "implementationDecision",
-    "authorization",
-    "result",
-    "actualImpact",
-    "calendar",
-  ];
 
   var __sfera_crawler_bg_BASE_URL =
     "https://sfera.vtb.ru/ppcg-fw/change-tasks/";
 
   var __sfera_crawler_bg_STORAGE_KEY = "crawlerProgress";
   var __sfera_crawler_bg_PAGE_TIMEOUT = 30000; // 30s per page
-  var __sfera_crawler_bg_MAX_RETRIES = 3;
   var __sfera_crawler_bg_DEFAULT_CONCURRENCY = 3; // parallel worker tabs
   var __sfera_crawler_bg_MAX_CONCURRENCY = 5;
   var __sfera_crawler_bg_LOG_MAX = 50;
@@ -45,7 +32,7 @@
   var __sfera_crawler_bg_stopRequested = false;
   var __sfera_crawler_bg_log = [];
   var __sfera_crawler_bg_errors = [];
-  var __sfera_crawler_bg_pageDataMap = {};      // key: "changeNumber:tabName", value: { resolve, reject, timeoutId }
+  var __sfera_crawler_bg_pageDataMap = {};      // key: "changeNumber:entity", value: { resolve, reject, timeoutId }
   var __sfera_crawler_bg_changeQueue = [];      // queue of change numbers to process
   var __sfera_crawler_bg_activeWorkers = 0;     // how many workers are currently running
   var __sfera_crawler_bg_tabBusy = [];          // parallel to crawlerTabIds, true=in use
@@ -109,20 +96,10 @@
   }
 
   /**
-   * Build URL for a change number and tab.
+   * Build URL for a change number.
    */
-  function __sfera_crawler_bg_buildUrl(changeNumber, tabName) {
-    return __sfera_crawler_bg_BASE_URL + changeNumber + "?tab=" + tabName;
-  }
-
-  /**
-   * Get the user-facing tab name from index.
-   */
-  function __sfera_crawler_bg_getTabName(index) {
-    if (index >= 0 && index < __sfera_crawler_bg_TABS.length) {
-      return __sfera_crawler_bg_TABS[index];
-    }
-    return null;
+  function __sfera_crawler_bg_buildUrl(changeNumber) {
+    return __sfera_crawler_bg_BASE_URL + changeNumber;
   }
 
   /**
@@ -250,7 +227,6 @@
     return {
       status: "running",
       currentNumber: null,
-      currentTabIndex: 0,
       collectedData: __sfera_crawler_bg_collectedData,
       errors: __sfera_crawler_bg_errors,
       consecutiveErrors: 0,
@@ -330,9 +306,6 @@
       var payload = {
         status: effectiveStatus,
         currentNumber: state ? state.currentNumber : null,
-        currentTab: state
-          ? __sfera_crawler_bg_getTabName(state.currentTabIndex)
-          : null,
         processedCount: state
           ? Object.keys(__sfera_crawler_bg_collectedData).length
           : 0,
@@ -537,11 +510,11 @@
 
   function __sfera_crawler_bg_waitForPageData(
     changeNumber,
-    tabName,
+    dataType,
     timeoutMs
   ) {
     return new Promise(function (resolve, reject) {
-      var key = changeNumber + ":" + tabName;
+      var key = changeNumber + ":" + dataType;
 
       // Check if data already arrived before we started waiting
       if (__sfera_crawler_bg_pageDataMap[key] && __sfera_crawler_bg_pageDataMap[key].data) {
@@ -553,7 +526,7 @@
 
       var timeoutId = setTimeout(function () {
         delete __sfera_crawler_bg_pageDataMap[key];
-        reject(new Error("Timeout waiting for PAGE_DATA: " + changeNumber + " / " + tabName));
+        reject(new Error("Timeout waiting for PAGE_DATA: " + changeNumber + " / " + dataType));
       }, timeoutMs);
 
       __sfera_crawler_bg_pageDataMap[key] = {
@@ -568,22 +541,20 @@
   }
 
   // ─────────────────────────────────────────────
-  // Process One Tab
+  // Process One Change Number
   // ─────────────────────────────────────────────
 
   /**
-   * Navigate one tab to a change's tab page and wait for PAGE_DATA.
-   * @param {number} tabId - The Chrome tab ID to use.
+   * Navigate tab to the change page and extract entity API data.
+   * @param {number} tabId - The Chrome tab to use.
    * @param {string} changeNumber - e.g. "C-VTB-00123456".
-   * @param {number} tabIndex - Index into TABS array.
    */
-  function __sfera_crawler_bg_processTab(tabId, changeNumber, tabIndex) {
+  function __sfera_crawler_bg_processTab(tabId, changeNumber) {
     return new Promise(function (resolve, reject) {
-      var tabName = __sfera_crawler_bg_getTabName(tabIndex);
-      var url = __sfera_crawler_bg_buildUrl(changeNumber, tabName);
+      var url = __sfera_crawler_bg_buildUrl(changeNumber);
 
       __sfera_crawler_bg_addLog(
-        "Навигация: " + changeNumber + " / " + tabName
+        "Навигация: " + changeNumber
       );
       __sfera_crawler_bg_sendStatus();
 
@@ -609,109 +580,101 @@
         return;
       }
 
-      // Wait for PAGE_DATA
+      // Wait for PAGE_DATA — key is changeNumber:entity
       __sfera_crawler_bg_waitForPageData(
         changeNumber,
-        tabName,
+        "entity",
         __sfera_crawler_bg_PAGE_TIMEOUT
       )
         .then(function (message) {
+          var entityData = __sfera_crawler_bg_extractEntityData(message, changeNumber);
           __sfera_crawler_bg_addLog(
-            "Данные получены: " + tabName + " (strategies: " +
-              (message.strategies || []).join(",") + ")"
+            "Данные получены: " + changeNumber +
+              (entityData ? " (entity OK)" : " (entity пуст)")
           );
-          resolve({
-            tabName: tabName,
-            data: message.data || {},
-            strategies: message.strategies || [],
-            partial: message.partial || false,
-          });
+          resolve(entityData);
         })
         .catch(function (err) {
           __sfera_crawler_bg_addLog(
-            "Ошибка: " + tabName + " — " + err.message
+            "Ошибка: " + changeNumber + " — " + err.message
           );
           reject(err);
         });
     });
   }
 
-  // ─────────────────────────────────────────────
-  // Process One Change Number (all 10 tabs)
-  // ─────────────────────────────────────────────
+  /**
+   * Extract entity API data from PAGE_DATA response.
+   * Looks for API responses matching /api/v0.1/entities/CHANGE_NUMBER.
+   * Returns the entity fields directly (dict), or null if not found.
+   */
+  function __sfera_crawler_bg_extractEntityData(message, changeNumber) {
+    if (!message || !message.data || typeof message.data !== "object") return null;
+
+    var apiData = message.data;
+    var keys = Object.keys(apiData);
+
+    // Find the entity API URL matching this change number
+    var entityPrefix = "/api/v0.1/entities/";
+    for (var i = 0; i < keys.length; i++) {
+      var url = keys[i];
+      if (url.indexOf(entityPrefix) !== -1 && url.indexOf(changeNumber) !== -1) {
+        var entity = apiData[url];
+        if (entity && typeof entity === "object" && !Array.isArray(entity)) {
+          return entity;
+        }
+      }
+    }
+
+    // Fallback: return the first object with a "number" field matching changeNumber
+    for (var j = 0; j < keys.length; j++) {
+      var data = apiData[keys[j]];
+      if (data && typeof data === "object" && data.number === changeNumber) {
+        return data;
+      }
+    }
+
+    return null;
+  }
 
   /**
-   * Process all 10 tabs of a change number using a given worker tab.
+   * Process one change number — navigate once, collect entity data.
    * @param {number} tabId - The Chrome tab to use.
    * @param {string} changeNumber - e.g. "C-VTB-00123456".
-   * @param {number} startTabIndex - Tab index to resume from (0 for fresh).
    */
-  function __sfera_crawler_bg_processNumber(tabId, changeNumber, startTabIndex) {
+  function __sfera_crawler_bg_processNumber(tabId, changeNumber) {
     return new Promise(function (resolve) {
-      var numberData = {};
-      var tabIndex = startTabIndex || 0;
+      if (__sfera_crawler_bg_stopRequested) {
+        resolve("stopped");
+        return;
+      }
 
-      function __sfera_crawler_bg_processNextTab() {
-        if (__sfera_crawler_bg_stopRequested) {
-          resolve("stopped");
-          return;
-        }
-
-        if (tabIndex >= __sfera_crawler_bg_TABS.length) {
-          // All tabs done — save data
-          __sfera_crawler_bg_collectedData[changeNumber] = numberData;
+      __sfera_crawler_bg_processTab(tabId, changeNumber)
+        .then(function (entityData) {
+          if (entityData) {
+            __sfera_crawler_bg_collectedData[changeNumber] = entityData;
+          }
           __sfera_crawler_bg_addLog(
             "Номер завершён: " + changeNumber +
-              " (табов: " + Object.keys(numberData).length + ")"
+              (entityData ? " (данные есть)" : " (данных нет)")
           );
           __sfera_crawler_bg_saveProgress();
           __sfera_crawler_bg_sendStatus();
           resolve("ok");
-          return;
-        }
-
-        var tabName = __sfera_crawler_bg_getTabName(tabIndex);
-
-        // Try up to MAX_RETRIES
-        var retries = 0;
-        function __sfera_crawler_bg_tryTab() {
-          __sfera_crawler_bg_processTab(tabId, changeNumber, tabIndex)
-            .then(function (result) {
-              numberData[result.tabName] = result;
-              tabIndex++;
-              __sfera_crawler_bg_processNextTab();
-            })
-            .catch(function (err) {
-              retries++;
-              if (retries < __sfera_crawler_bg_MAX_RETRIES) {
-                __sfera_crawler_bg_addLog(
-                  "Повтор " + retries + "/" + __sfera_crawler_bg_MAX_RETRIES +
-                    " для " + tabName
-                );
-                // Wait before retry
-                setTimeout(__sfera_crawler_bg_tryTab, 2000);
-              } else {
-                // Give up on this tab
-                __sfera_crawler_bg_errors.push({
-                  number: changeNumber,
-                  tab: tabName,
-                  error: err.message,
-                  timestamp: new Date().toISOString(),
-                });
-                numberData[tabName] = {
-                  error: err.message,
-                  partial: true,
-                };
-                tabIndex++;
-                __sfera_crawler_bg_processNextTab();
-              }
-            });
-        }
-
-        __sfera_crawler_bg_tryTab();
-      }
-
-      __sfera_crawler_bg_processNextTab();
+        })
+        .catch(function (err) {
+          __sfera_crawler_bg_errors.push({
+            number: changeNumber,
+            error: err.message,
+            timestamp: new Date().toISOString(),
+          });
+          __sfera_crawler_bg_addLog(
+            "Номер не удался: " + changeNumber + " — " + err.message
+          );
+          __sfera_crawler_bg_saveProgress();
+          __sfera_crawler_bg_sendStatus();
+          resolve("error");
+        });
     });
   }
 
@@ -835,7 +798,6 @@
       __sfera_crawler_bg_tabBusy[busyIdx] = true;
       __sfera_crawler_bg_activeWorkers++;
       __sfera_crawler_bg_state.currentNumber = changeNumber;
-      __sfera_crawler_bg_state.currentTabIndex = 0;
 
       __sfera_crawler_bg_addLog(
         "Запуск потока: " + changeNumber +
@@ -845,7 +807,7 @@
 
       // IIFE captures changeNumber, busyIdx so the .then closure sees the right values
       (function (capturedNumber, capturedBusyIdx) {
-        __sfera_crawler_bg_processNumber(tabId, capturedNumber, 0)
+        __sfera_crawler_bg_processNumber(tabId, capturedNumber)
           .then(function (result) {
             __sfera_crawler_bg_activeWorkers--;
             __sfera_crawler_bg_tabBusy[capturedBusyIdx] = false;
@@ -944,37 +906,19 @@
 
   /**
    * Format collected data for JSON export.
-   * Returns a clean object with metadata + collected data per change number.
+   * Each change number maps directly to entity API data (flat structure).
    */
   function __sfera_crawler_bg_formatExportData() {
     var exportData = {
       exportedAt: new Date().toISOString(),
       totalNumbers: Object.keys(__sfera_crawler_bg_collectedData).length,
-      mode: __sfera_crawler_bg_state && __sfera_crawler_bg_state.settings
-        ? __sfera_crawler_bg_state.settings.mode
-        : "single",
       changes: {},
     };
 
     var keys = Object.keys(__sfera_crawler_bg_collectedData);
     for (var i = 0; i < keys.length; i++) {
       var changeNumber = keys[i];
-      var tabs = __sfera_crawler_bg_collectedData[changeNumber];
-      var cleanTabs = {};
-
-      var tabNames = Object.keys(tabs);
-      for (var j = 0; j < tabNames.length; j++) {
-        var tabName = tabNames[j];
-        var tabData = tabs[tabName];
-        cleanTabs[tabName] = {
-          data: tabData.data || {},
-          strategies: tabData.strategies || [],
-          partial: tabData.partial || false,
-          error: tabData.error || null,
-        };
-      }
-
-      exportData.changes[changeNumber] = cleanTabs;
+      exportData.changes[changeNumber] = __sfera_crawler_bg_collectedData[changeNumber];
     }
 
     return exportData;
@@ -1040,7 +984,7 @@
       var singleData = {
         exportedAt: new Date().toISOString(),
         changeNumber: changeNumber,
-        tabs: __sfera_crawler_bg_collectedData[changeNumber],
+        data: __sfera_crawler_bg_collectedData[changeNumber],
       };
       promises.push(
         __sfera_crawler_bg_downloadJson(
@@ -1183,59 +1127,35 @@
   }
 
   /**
-   * Flatten one change's data into a flat row object for CSV.
-   * Extracts data from the "mainInfo" tab (the change entity).
+   * Flatten one change's entity data into a flat row object for CSV.
    */
-  function __sfera_crawler_bg_flattenChange(changeNumber, tabs) {
+  function __sfera_crawler_bg_flattenChange(changeNumber, entityData) {
     var row = { changeNumber: changeNumber };
 
-    var mainInfo = tabs["mainInfo"];
-    if (!mainInfo || !mainInfo.data) return row;
-
-    // mainInfo.data is keyed by URL — find the entity object
-    var entity = null;
-    var dataUrls = Object.keys(mainInfo.data);
-    for (var i = 0; i < dataUrls.length; i++) {
-      var candidate = mainInfo.data[dataUrls[i]];
-      if (candidate && candidate.number === changeNumber) {
-        entity = candidate;
-        break;
-      }
-    }
-    if (!entity) {
-      // Fallback: take the first non-empty object
-      for (var j = 0; j < dataUrls.length; j++) {
-        var c = mainInfo.data[dataUrls[j]];
-        if (c && typeof c === "object" && Object.keys(c).length > 0) {
-          entity = c;
-          break;
-        }
-      }
-    }
-    if (!entity) return row;
+    if (!entityData || typeof entityData !== "object") return row;
 
     // Top-level fields
-    row.number = entity.number || "";
-    row.type = entity.type || "";
-    row.status = entity.status || "";
-    row.priority = entity.priority || "";
-    row.name = entity.name || "";
-    row.description = entity.description || "";
-    row.createDate = entity.createDate || "";
-    row.updateDate = entity.updateDate || "";
-    row.state = entity.state || "";
+    row.number = entityData.number || "";
+    row.type = (entityData.type && entityData.type.name) || entityData.type || "";
+    row.status = (entityData.status && entityData.status.name) || entityData.status || "";
+    row.priority = (entityData.priority && entityData.priority.name) || entityData.priority || "";
+    row.name = entityData.name || "";
+    row.description = entityData.description || "";
+    row.createDate = entityData.createDate || "";
+    row.updateDate = entityData.updateDate || "";
+    row.state = entityData.state || "";
 
     // Created by / Updated by
-    if (entity.createdBy) {
-      row.creator = (entity.createdBy.firstName || "") + " " + (entity.createdBy.lastName || "");
+    if (entityData.createdBy) {
+      row.creator = (entityData.createdBy.firstName || "") + " " + (entityData.createdBy.lastName || "");
     }
-    if (entity.updatedBy) {
-      row.updater = (entity.updatedBy.firstName || "") + " " + (entity.updatedBy.lastName || "");
+    if (entityData.updatedBy) {
+      row.updater = (entityData.updatedBy.firstName || "") + " " + (entityData.updatedBy.lastName || "");
     }
 
     // Configuration unit (first entry)
-    if (entity.configurationUnit && entity.configurationUnit.length > 0) {
-      var cu = entity.configurationUnit[0];
+    if (entityData.configurationUnit && entityData.configurationUnit.length > 0) {
+      var cu = entityData.configurationUnit[0];
       row.configUnit = cu.name || "";
       row.configUnitType = cu.type || "";
       row.configUnitStatus = cu.status || "";
@@ -1244,9 +1164,9 @@
     }
 
     // Custom fields — each code becomes a column
-    if (entity.customFieldsValues && Array.isArray(entity.customFieldsValues)) {
-      for (var k = 0; k < entity.customFieldsValues.length; k++) {
-        var cf = entity.customFieldsValues[k];
+    if (entityData.customFieldsValues && Array.isArray(entityData.customFieldsValues)) {
+      for (var k = 0; k < entityData.customFieldsValues.length; k++) {
+        var cf = entityData.customFieldsValues[k];
         if (cf.code) {
           row["cf_" + cf.code] = __sfera_crawler_bg_extractCsvValue(cf.value);
         }
@@ -1428,7 +1348,6 @@
 
     __sfera_crawler_bg_state = __sfera_crawler_bg_buildState();
     __sfera_crawler_bg_state.currentNumber = startStr;
-    __sfera_crawler_bg_state.currentTabIndex = 0;
     __sfera_crawler_bg_state.settings = {
       startNumber: payload.startNumber,
       endNumber: endNumber,
@@ -1490,8 +1409,7 @@
       __sfera_crawler_bg_registerInterceptor();
 
       __sfera_crawler_bg_addLog(
-        "Возобновление обхода с " + progress.currentNumber +
-          " (таб: " + __sfera_crawler_bg_getTabName(progress.currentTabIndex) + ")"
+        "Возобновление обхода с " + progress.currentNumber
       );
 
       if (sendResponse) sendResponse({ success: true });
@@ -1574,11 +1492,6 @@
       currentNumber: __sfera_crawler_bg_state
         ? __sfera_crawler_bg_state.currentNumber
         : null,
-      currentTab: __sfera_crawler_bg_state
-        ? __sfera_crawler_bg_getTabName(
-            __sfera_crawler_bg_state.currentTabIndex
-          )
-        : null,
       processedCount: Object.keys(__sfera_crawler_bg_collectedData)
         .length,
       totalCount: __sfera_crawler_bg_state && __sfera_crawler_bg_state.settings
@@ -1659,7 +1572,7 @@
             return true;
 
           case "PAGE_DATA": {
-            // From content script — route via pageDataMap using changeNumber:tabName
+            // From content script — route via pageDataMap using changeNumber:entity
             var msg = message;
             var mapKey = (msg.changeNumber || "unknown") + ":" + (msg.tabName || "unknown");
             if (__sfera_crawler_bg_pageDataMap[mapKey] && __sfera_crawler_bg_pageDataMap[mapKey].resolve) {
